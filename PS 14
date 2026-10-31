@@ -1,0 +1,177 @@
+CREATE DATABASE PS14_DB;
+USE PS14_DB;
+
+CREATE TABLE Customer (
+    cust_id INT PRIMARY KEY,
+    cust_name VARCHAR(30),
+    city VARCHAR(30),
+    phone VARCHAR(15)
+);
+
+CREATE TABLE Branch (
+    branch_id INT PRIMARY KEY,
+    branch_name VARCHAR(30),
+    branch_city VARCHAR(30)
+);
+
+CREATE TABLE Account (
+    acc_no INT PRIMARY KEY,
+    cust_id INT,
+    branch_id INT,
+    balance DECIMAL(10,2),
+    FOREIGN KEY (cust_id) REFERENCES Customer(cust_id),
+    FOREIGN KEY (branch_id) REFERENCES Branch(branch_id)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    cust_id INT,
+    branch_id INT,
+    amount DECIMAL(10,2),
+    FOREIGN KEY (cust_id) REFERENCES Customer(cust_id),
+    FOREIGN KEY (branch_id) REFERENCES Branch(branch_id)
+);
+
+
+INSERT INTO Customer VALUES
+(1,'Dinesh','Pune','9876543210'),
+(2,'Atharv','Pune','9876543211'),
+(3,'Arnav','Mumbai','9876543212'),
+(4,'Om','Nashik',NULL),
+(5,'Deepak','Pune','9876543214'),
+(6,'Pranav','Mumbai','9876543215'),
+(7,'Anand','Pune','9876543216'),
+(8,'Anjali','Mumbai',NULL),
+(9,'Jyoti','Pune','9876543218'),
+(10,'Pratiksha','Mumbai','9876543219');
+
+
+
+INSERT INTO Branch VALUES
+(1,'Akurdi','Pune'),
+(2,'Chinchwad','Pune'),
+(3,'Pune Camp','Pune'),
+(4,'Mumbai Central','Mumbai'),
+(5,'Nashik','Nashik'),
+(6,'Thane','Thane'),
+(7,'Kothrud','Pune'),
+(8,'Baner','Pune'),
+(9,'Vashi','Mumbai'),
+(10,'Wakad','Pune');
+
+
+INSERT INTO Account VALUES
+(2001,1,1,45000),
+(2002,2,1,60000),
+(2003,3,2,35000),
+(2004,4,2,55000),
+(2005,5,3,70000),
+(2006,6,3,40000),
+(2007,7,4,30000),
+(2008,8,4,50000),
+(2009,9,5,80000),
+(2010,10,5,90000);
+
+
+INSERT INTO Loan VALUES
+(3001,1,1,60000),
+(3002,2,1,70000),
+(3003,3,2,30000),
+(3004,4,2,40000),
+(3005,5,3,80000),
+(3006,6,3,90000),
+(3007,7,4,20000),
+(3008,8,4,25000),
+(3009,9,5,100000),
+(3010,10,5,120000);
+
+
+
+Q1. Display customers living in Pune or Mumbai alphabetically
+SELECT *
+FROM Customer
+WHERE city IN ('Pune', 'Mumbai')
+ORDER BY cust_name ASC;
+
+
+Q2. Display customers whose names contain 'a'
+SELECT *
+FROM Customer
+WHERE cust_name LIKE '%a%';
+
+
+Q3. Display customers whose phone number is NOT NULL
+SELECT *
+FROM Customer
+WHERE phone IS NOT NULL;
+
+
+Q4. Display customers living in Pune whose names start with P, or customers living in Mumbai
+SELECT *
+FROM Customer
+WHERE (city = 'Pune' AND cust_name LIKE 'P%')
+   OR city = 'Mumbai';
+
+
+Q5. Display maximum and average loan amount for each branch
+SELECT B.branch_name,
+       MAX(L.amount) AS maximum_loan,
+       AVG(L.amount) AS average_loan
+FROM Branch B
+JOIN Loan L ON B.branch_id = L.branch_id
+GROUP BY B.branch_name;
+
+
+Q6. Display branches whose total loan amount exceeds ₹1,00,000
+SELECT B.branch_name,
+       SUM(L.amount) AS total_loan
+FROM Branch B
+JOIN Loan L ON B.branch_id = L.branch_id
+GROUP BY B.branch_name
+HAVING SUM(L.amount) > 100000;
+
+
+Q7. Display account numbers with balance after adding ₹500
+SELECT acc_no,
+       balance + 500 AS updated_balance
+FROM Account;
+
+
+Q8. Change the branch of account number 2005
+UPDATE Account
+SET branch_id = 4
+WHERE acc_no = 2005;
+
+
+Q9. Delete customers whose phone number is NULL
+DELETE FROM Customer
+WHERE phone IS NULL;
+
+
+
+Q10(a). Customers who have both an account and a loan using INTERSECT
+SELECT cust_id
+FROM Account
+
+INTERSECT
+
+SELECT cust_id
+FROM Loan;
+
+
+Q10(b). Customers who have an account but no loan using MINUS
+SELECT cust_id
+FROM Account
+
+MINUS
+
+SELECT cust_id
+FROM Loan;
+
+
+MySQL note: MySQL supports INTERSECT starting from version 8.0.31. It
+does not support MINUS; use EXCEPT in MySQL 8.0.31 and later:
+
+SELECT cust_id FROM Account
+EXCEPT
+SELECT cust_id FROM Loan;
