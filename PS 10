@@ -1,0 +1,171 @@
+CREATE DATABASE BankDB;
+USE BankDB;
+
+CREATE TABLE Branch (
+    branch_name VARCHAR(30) PRIMARY KEY,
+    branch_city VARCHAR(30) NOT NULL,
+    assets DECIMAL(12,2)
+);
+
+CREATE TABLE Customer (
+    cust_name VARCHAR(30) PRIMARY KEY,
+    cust_street VARCHAR(50),
+    cust_city VARCHAR(30)
+);
+
+CREATE TABLE Account (
+    acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(30),
+    balance DECIMAL(12,2),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(30),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (acc_no)
+        REFERENCES Account(acc_no)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(30),
+    amount DECIMAL(12,2),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(30),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (loan_no)
+        REFERENCES Loan(loan_no)
+);
+
+------------*---------------*----------------*----------------*----------*--------
+INSERT INTO Branch VALUES
+('Akurdi', 'Pune', 5000000),
+('Chinchwad', 'Pune', 7000000),
+('Pune Camp', 'Pune', 6000000),
+('Mumbai Central', 'Mumbai', 10000000);
+
+
+
+INSERT INTO Customer VALUES
+('Dinesh', 'MG Road', 'Pune'),
+('Atharv', 'FC Road', 'Pune'),
+('Arnav', 'Station Road', 'Mumbai'),
+('Om', 'Shivaji Nagar', 'Pune'),
+('Deepak', 'JM Road', 'Pune'),
+('Pranav', 'Baner Road', 'Pune'),
+('Anand', 'Main Street', 'Mumbai'),
+('Anjali', 'Akurdi Road', 'Pune'),
+('Jyoti', 'Link Road', 'Mumbai'),
+('Pratiksha', 'Market Road', 'Pune');
+
+
+INSERT INTO Account VALUES
+(1001, 'Akurdi', 45000),
+(1002, 'Akurdi', 60000),
+(1003, 'Akurdi', 35000),
+(1004, 'Chinchwad', 55000),
+(1005, 'Chinchwad', 70000),
+(1006, 'Chinchwad', 40000),
+(1007, 'Pune Camp', 30000),
+(1008, 'Pune Camp', 50000),
+(1009, 'Mumbai Central', 80000),
+(1010, 'Mumbai Central', 90000);
+
+
+INSERT INTO Depositor VALUES
+('Dinesh', 1001),
+('Atharv', 1002),
+('Arnav', 1003),
+('Om', 1004),
+('Deepak', 1005),
+('Pranav', 1006),
+('Anand', 1007),
+('Anjali', 1008),
+('Jyoti', 1009),
+('Pratiksha', 1010);
+
+INSERT INTO Loan VALUES
+(2001, 'Akurdi', 600000),
+(2002, 'Akurdi', 700000),
+(2003, 'Akurdi', 300000),
+(2004, 'Chinchwad', 400000),
+(2005, 'Chinchwad', 800000),
+(2006, 'Chinchwad', 900000),
+(2007, 'Pune Camp', 200000),
+(2008, 'Pune Camp', 250000),
+(2009, 'Mumbai Central', 1000000),
+(2010, 'Mumbai Central', 1200000);
+
+
+INSERT INTO Borrower VALUES
+('Dinesh', 2001),
+('Atharv', 2002),
+('Arnav', 2003),
+('Om', 2004),
+('Deepak', 2005),
+('Pranav', 2006),
+('Anand', 2007),
+('Anjali', 2008),
+('Jyoti', 2009),
+('Pratiksha', 2010);
+
+ALTER TABLE Customer
+ADD phone VARCHAR(15);
+
+ALTER TABLE Customer
+DROP COLUMN phone;
+
+SELECT DISTINCT branch_name
+FROM Loan;
+
+SELECT B.cust_name, L.loan_no, L.amount
+FROM Borrower B
+JOIN Loan L
+ON B.loan_no = L.loan_no;
+
+SELECT DISTINCT B.cust_name
+FROM Borrower B
+JOIN Loan L
+ON B.loan_no = L.loan_no
+WHERE L.branch_name = 'Akurdi'
+ORDER BY B.cust_name ASC;
+
+
+SELECT AVG(balance) AS average_balance
+FROM Account
+WHERE branch_name = 'Chinchwad';
+
+SELECT A.branch_name,
+       COUNT(DISTINCT D.cust_name) AS depositor_count
+FROM Account A
+JOIN Depositor D
+ON A.acc_no = D.acc_no
+GROUP BY A.branch_name;
+
+
+SELECT branch_name,
+       SUM(amount) AS total_loan_amount
+FROM Loan
+GROUP BY branch_name;
+
+
+SELECT branch_name,
+       AVG(amount) AS average_loan_amount
+FROM Loan
+GROUP BY branch_name
+HAVING AVG(amount) > 500000;
+
+
+
