@@ -3,24 +3,23 @@ CREATE TABLE areas (
     area NUMBER
 );
 
-CREATE OR REPLACE FUNCTION circle_area (
-    p_radius IN NUMBER
-)
+CREATE OR REPLACE FUNCTION circle_area(r NUMBER)
 RETURN NUMBER
 IS
+    a NUMBER;
 BEGIN
-    RETURN 3.14159 * p_radius * p_radius;
+    a := 3.14 * r * r;
+    RETURN a;
 END;
 /
 
 BEGIN
-  FOR r IN 5..9 LOOP
-      INSERT INTO areas (radius, area)
-      VALUES (r, circle_area(r));
-  END LOOP;
-
-  COMMIT;
+    FOR i IN 5..9
+    LOOP
+        INSERT INTO areas (radius, area)
+        VALUES (i, circle_area(i));
+    END LOOP;
 END;
 /
 
-SELECT * FROM areas ORDER BY radius;
+SELECT * FROM areas;
