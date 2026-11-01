@@ -1,0 +1,51 @@
+CREATE TABLE Employee (
+    Emp_ID NUMBER PRIMARY KEY,
+    Emp_Name VARCHAR2(50),
+    Department VARCHAR2(30),
+    Salary NUMBER
+);
+
+INSERT INTO Employee (Emp_ID, Emp_Name, Department, Salary)
+VALUES (1, 'Dinesh', 'Computer', 45000);
+
+INSERT INTO Employee (Emp_ID, Emp_Name, Department, Salary)
+VALUES (2, 'Atharv', 'IT', 28000);
+
+INSERT INTO Employee (Emp_ID, Emp_Name, Department, Salary)
+VALUES (3, 'Arnav', 'Computer', 35000);
+
+INSERT INTO Employee (Emp_ID, Emp_Name, Department, Salary)
+VALUES (4, 'Om', 'Mechanical', 32000);
+
+INSERT INTO Employee (Emp_ID, Emp_Name, Department, Salary)
+VALUES (5, 'Deepak', 'IT', 25000);
+
+SELECT * FROM Employee;
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT Emp_ID, Emp_Name, Department, Salary
+        FROM Employee
+        WHERE Salary > 30000;
+
+    emp_record emp_cursor%ROWTYPE;
+BEGIN
+    OPEN emp_cursor;
+
+    LOOP
+        FETCH emp_cursor INTO emp_record;
+        EXIT WHEN emp_cursor%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE(
+            emp_record.Emp_ID || ' | ' ||
+            emp_record.Emp_Name || ' | ' ||
+            emp_record.Department || ' | ' ||
+            emp_record.Salary
+        );
+    END LOOP;
+
+    CLOSE emp_cursor;
+END;
+/
