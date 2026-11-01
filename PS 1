@@ -1,0 +1,171 @@
+CREATE DATABASE BankDB;
+USE BankDB;
+
+CREATE TABLE Customer (
+    cust_id INT PRIMARY KEY,
+    cust_name VARCHAR(30),
+    city VARCHAR(30),
+    phone VARCHAR(15)
+);
+
+CREATE TABLE Branch (
+    branch_id INT PRIMARY KEY,
+    branch_name VARCHAR(30),
+    branch_city VARCHAR(30)
+);
+
+CREATE TABLE Account (
+    acc_no INT PRIMARY KEY,
+    cust_id INT,
+    branch_id INT,
+    balance DECIMAL(10,2),
+    FOREIGN KEY (cust_id) REFERENCES Customer(cust_id),
+    FOREIGN KEY (branch_id) REFERENCES Branch(branch_id)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    cust_id INT,
+    branch_id INT,
+    amount DECIMAL(10,2),
+    FOREIGN KEY (cust_id) REFERENCES Customer(cust_id),
+    FOREIGN KEY (branch_id) REFERENCES Branch(branch_id)
+);
+
+
+INSERT INTO Customer VALUES
+(1,'Dinesh','Pune','9876543210'),
+(2,'Atharv','Pune','9876543211'),
+(3,'Arnav','Mumbai','9876543212'),
+(4,'Om','Nashik',NULL),
+(5,'Deepak','Pune','9876543214'),
+(6,'Pranav','Mumbai','9876543215'),
+(7,'Anand','Pune','9876543216'),
+(8,'Anjali','Mumbai',NULL),
+(9,'Jyoti','Pune','9876543218'),
+(10,'Pratiksha','Mumbai','9876543219');
+
+
+
+INSERT INTO Branch VALUES
+(1,'Akurdi','Pune'),
+(2,'Chinchwad','Pune'),
+(3,'Pune Camp','Pune'),
+(4,'Mumbai Central','Mumbai'),
+(5,'Nashik','Nashik'),
+(6,'Thane','Thane'),
+(7,'Kothrud','Pune'),
+(8,'Baner','Pune'),
+(9,'Vashi','Mumbai'),
+(10,'Wakad','Pune');
+
+
+INSERT INTO Account VALUES
+(2001,1,1,45000),
+(2002,2,1,60000),
+(2003,3,2,35000),
+(2004,4,2,55000),
+(2005,5,3,70000),
+(2006,6,3,40000),
+(2007,7,4,30000),
+(2008,8,4,50000),
+(2009,9,5,80000),
+(2010,10,5,90000);
+
+
+INSERT INTO Loan VALUES
+(3001,1,1,60000),
+(3002,2,1,70000),
+(3003,3,2,30000),
+(3004,4,2,40000),
+(3005,5,3,80000),
+(3006,6,3,90000),
+(3007,7,4,20000),
+(3008,8,4,25000),
+(3009,9,5,100000),
+(3010,10,5,120000);
+
+
+------------*--------------*---------------/*------------------*--------------
+
+1. Display all customers alphabetically by name
+SELECT *
+FROM Customer
+ORDER BY cust_name ASC;
+
+
+2. Display names and cities of customers whose names start with P
+SELECT cust_name, city
+FROM Customer
+WHERE cust_name LIKE 'P%';
+
+
+3. Customers who live in Pune or Mumbai and have a phone number
+SELECT *
+FROM Customer
+WHERE city IN ('Pune', 'Mumbai')
+  AND phone IS NOT NULL;
+
+
+4. Display customers whose phone number is NULL
+SELECT *
+FROM Customer
+WHERE phone IS NULL;
+
+
+5. Average account balance for each branch
+SELECT
+    B.branch_name,
+    AVG(A.balance) AS avg_balance
+FROM Branch B
+INNER JOIN Account A
+    ON B.branch_id = A.branch_id
+GROUP BY B.branch_id, B.branch_name;
+
+
+6. Branch-wise average balance greater than ₹40,000
+SELECT
+    B.branch_name,
+    AVG(A.balance) AS avg_balance
+FROM Branch B
+INNER JOIN Account A
+    ON B.branch_id = A.branch_id
+GROUP BY B.branch_id, B.branch_name
+HAVING AVG(A.balance) > 40000;
+
+
+7. Account number and balance after adding 10% interest
+SELECT
+    acc_no,
+    balance,
+    balance * 1.10 AS balance_with_interest
+FROM Account;
+
+
+8. Update a customer's phone number using their name
+Replace the sample name and phone number with your chosen values:
+UPDATE Customer
+SET phone = '9876543210'
+WHERE cust_name = 'Dinesh';
+
+
+9. Delete all customers who live in Pune
+DELETE FROM Customer
+WHERE city = 'Pune';
+
+
+10. Customers who either have an account or a loan (UNION)
+SELECT cust_id, cust_name
+FROM Customer
+WHERE cust_id IN (SELECT cust_id FROM Account)
+
+UNION
+
+SELECT cust_id, cust_name
+FROM Customer
+WHERE cust_id IN (SELECT cust_id FROM Loan);
+
+
+UNION combines results and removes duplicates.
+
+
