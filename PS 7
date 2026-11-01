@@ -1,0 +1,62 @@
+CREATE TABLE Library (
+    book_id NUMBER PRIMARY KEY,
+    book_name VARCHAR2(100),
+    author VARCHAR2(50),
+    category VARCHAR2(30),
+    book_date DATE,
+    operation VARCHAR2(10)
+);
+
+CREATE TABLE Library_Audit (
+    book_id NUMBER,
+    book_name VARCHAR2(100),
+    author VARCHAR2(50),
+    category VARCHAR2(30),
+    book_date DATE,
+    operation VARCHAR2(10)
+);
+
+INSERT INTO Library VALUES (1, 'Database System Concepts', 'Silberschatz', 'Education', DATE '2026-01-10', 'INSERT');
+INSERT INTO Library VALUES (2, 'Clean Code', 'Robert Martin', 'Programming', DATE '2026-01-11', 'INSERT');
+INSERT INTO Library VALUES (3, 'The Alchemist', 'Paulo Coelho', 'Fiction', DATE '2026-01-12', 'INSERT');
+INSERT INTO Library VALUES (4, 'Operating System Concepts', 'Galvin', 'Education', DATE '2026-01-13', 'INSERT');
+INSERT INTO Library VALUES (5, 'Computer Networks', 'Andrew Tanenbaum', 'Networking', DATE '2026-01-14', 'INSERT');
+INSERT INTO Library VALUES (6, 'Let Us C', 'Yashavant Kanetkar', 'Programming', DATE '2026-01-15', 'INSERT');
+INSERT INTO Library VALUES (7, 'Artificial Intelligence', 'Stuart Russell', 'AI', DATE '2026-01-16', 'INSERT');
+INSERT INTO Library VALUES (8, 'Introduction to Algorithms', 'Cormen', 'Algorithms', DATE '2026-01-17', 'INSERT');
+INSERT INTO Library VALUES (9, 'Python Crash Course', 'Eric Matthes', 'Programming', DATE '2026-01-18', 'INSERT');
+INSERT INTO Library VALUES (10, 'Computer Organization', 'Carl Hamacher', 'Education', DATE '2026-01-19', 'INSERT');
+
+COMMIT;
+SELECT * FROM Library ORDER BY book_id;
+
+
+CREATE OR REPLACE TRIGGER trg_library_audit
+BEFORE UPDATE OR DELETE ON Library
+FOR EACH ROW
+BEGIN
+    IF DELETING THEN
+        INSERT INTO Library_Audit
+            (book_id, book_name, author, category, book_date, operation)
+        VALUES
+            (:OLD.book_id, :OLD.book_name, :OLD.author,
+             :OLD.category, :OLD.book_date, 'DELETE');
+
+    ELSIF UPDATING THEN
+        INSERT INTO Library_Audit
+            (book_id, book_name, author, category, book_date, operation)
+        VALUES
+            (:OLD.book_id, :OLD.book_name, :OLD.author,
+             :OLD.category, :OLD.book_date, 'UPDATE');
+    END IF;
+END;
+/
+
+UPDATE Library
+SET category = 'Reference'
+WHERE book_id = 1;
+
+COMMIT;
+
+SELECT * FROM Library_Audit
+ORDER BY book_id;
