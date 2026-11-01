@@ -1,0 +1,54 @@
+CREATE TABLE Stud_Marks (
+    rollno INT PRIMARY KEY,
+    name VARCHAR(50),
+    total_marks INT
+);
+
+CREATE TABLE Result (
+    Roll INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Class VARCHAR(30)
+);
+
+INSERT INTO Stud_Marks (rollno, name, total_marks) VALUES
+(1, 'Dinesh', 1450),
+(2, 'Atharv', 1200),
+(3, 'Arnav', 980),
+(4, 'Om', 920),
+(5, 'Deepak', 850),
+(6, 'Pranav', 830),
+(7, 'Anand', 800),
+(8, 'Anjali', 760),
+(9, 'Jyoti', 700),
+(10, 'Pratiksha', 650);
+
+SELECT * FROM Stud_Marks;
+
+CREATE OR REPLACE PROCEDURE proc_Grade AS
+BEGIN
+    FOR student IN (
+        SELECT roll_no, name, total_marks
+        FROM Stud_Marks
+    ) LOOP
+        IF student.total_marks BETWEEN 990 AND 1500 THEN
+            INSERT INTO Result (roll_no, name, class)
+            VALUES (student.roll_no, student.name, 'Distinction');
+
+        ELSIF student.total_marks BETWEEN 900 AND 989 THEN
+            INSERT INTO Result (roll_no, name, class)
+            VALUES (student.roll_no, student.name, 'First Class');
+
+        ELSIF student.total_marks BETWEEN 825 AND 899 THEN
+            INSERT INTO Result (roll_no, name, class)
+            VALUES (student.roll_no, student.name, 'Higher Second Class');
+        END IF;
+    END LOOP;
+END;
+/
+
+BEGIN
+    proc_Grade;
+END;
+/
+
+SELECT * FROM Result ORDER BY roll_no;
