@@ -1,18 +1,16 @@
--- =========================================
--- PS2: DATABASE CREATION AND SETUP
--- =========================================
+
 
 CREATE DATABASE PS2_DB;
 USE PS2_DB;
 
--- Create Students table
+
 CREATE TABLE Students (
     student_id INT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     city VARCHAR(50)
 );
 
--- Create Enrolments table
+
 CREATE TABLE Enrolments (
     enroll_id INT PRIMARY KEY,
     student_id INT,
@@ -22,7 +20,6 @@ CREATE TABLE Enrolments (
         REFERENCES Students(student_id)
 );
 
--- Insert records into Students
 INSERT INTO Students VALUES
 (1, 'Dinesh', 'Pune'),
 (2, 'Atharv', 'Mumbai'),
@@ -49,22 +46,12 @@ INSERT INTO Enrolments VALUES
 (110, 9, 'Java', 74);
 
 
--- =========================================
--- QUERY 1
--- Display student names with course and marks
--- =========================================
-
 SELECT S.name, E.course, E.marks
 FROM Students S
 INNER JOIN Enrolments E
     ON S.student_id = E.student_id;
 
 
--- =========================================
--- QUERY 2
--- Display all students and their enrolment info,
--- including students without enrolments
--- =========================================
 
 SELECT S.name, E.course, E.marks
 FROM Students S
@@ -72,10 +59,6 @@ LEFT JOIN Enrolments E
     ON S.student_id = E.student_id;
 
 
--- =========================================
--- QUERY 3
--- Display all enrolments with student names
--- =========================================
 
 SELECT E.enroll_id, S.name, E.course, E.marks
 FROM Enrolments E
@@ -83,11 +66,6 @@ LEFT JOIN Students S
     ON E.student_id = S.student_id;
 
 
--- =========================================
--- QUERY 4
--- Display all possible combinations of students
--- and distinct courses
--- =========================================
 
 SELECT S.name, C.course
 FROM Students S
@@ -97,11 +75,6 @@ CROSS JOIN (
 ) C;
 
 
--- =========================================
--- QUERY 5
--- Display students whose marks are above
--- the average marks of all enrolments
--- =========================================
 
 SELECT S.name, E.course, E.marks
 FROM Students S
@@ -112,12 +85,6 @@ WHERE E.marks > (
     FROM Enrolments
 );
 
-
--- =========================================
--- QUERY 6
--- Display students who scored more than 80
--- =========================================
-
 SELECT S.name, E.course, E.marks
 FROM Students S
 INNER JOIN Enrolments E
@@ -125,10 +92,6 @@ INNER JOIN Enrolments E
 WHERE E.marks > 80;
 
 
--- =========================================
--- QUERY 7
--- Display students enrolled in DBMS
--- =========================================
 
 SELECT S.name
 FROM Students S
@@ -137,10 +100,6 @@ INNER JOIN Enrolments E
 WHERE E.course = 'DBMS';
 
 
--- =========================================
--- QUERY 8
--- Display student ID(s) with the highest marks
--- =========================================
 
 SELECT student_id
 FROM Enrolments
@@ -150,10 +109,7 @@ WHERE marks = (
 );
 
 
--- =========================================
--- QUERY 9
--- Create, display, and update a view
--- =========================================
+
 
 CREATE VIEW student_course_view AS
 SELECT S.name, E.course, E.marks
@@ -161,33 +117,25 @@ FROM Students S
 INNER JOIN Enrolments E
     ON S.student_id = E.student_id;
 
--- Display the view
+
 SELECT * FROM student_course_view;
 
--- Update marks through the view
+
 UPDATE student_course_view
 SET marks = 89
 WHERE name = 'Dinesh'
   AND course = 'DBMS';
 
--- Verify the update
+
 SELECT * FROM student_course_view
 WHERE name = 'Dinesh';
 
 
--- =========================================
--- QUERY 10
--- Create indexes
--- =========================================
-
--- Create an index on Students.name
 CREATE INDEX idx_student_name
 ON Students(name);
 
--- Create a unique index on Enrolments.enroll_id
 CREATE UNIQUE INDEX idx_enroll_id
 ON Enrolments(enroll_id);
 
--- Display indexes
 SHOW INDEX FROM Students;
 SHOW INDEX FROM Enrolments;
